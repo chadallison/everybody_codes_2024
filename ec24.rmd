@@ -1,0 +1,173 @@
+---
+title: "Everybody Codes 2024"
+output: github_document
+knit: (function(input, ...) { rmarkdown::render(input, output_file = "README.md", envir = globalenv()) })
+---
+
+```{r message = F, warning = F, include = F}
+library(tidyverse)
+library(tvthemes)
+library(glue)
+
+theme_custom = theme_avatar() +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5, size = 9, vjust = 2.5, face = "italic"),
+        plot.caption = element_text(face = "italic"),
+        panel.grid.major = element_line(linewidth = 0.5, colour = "#DFDAD1"),
+        panel.grid.minor = element_line(linewidth = 0.5, colour = "#DFDAD1"))
+
+theme_set(theme_custom)
+```
+
+### Quest 1
+
+```{r}
+input = readLines("inputs/q1p1.txt")
+df = data.frame(enemy = unlist(strsplit(input, split = "")))
+
+x = df |>
+  mutate(potions = case_when(enemy == "A" ~ 0,
+                             enemy == "B" ~ 1,
+                             enemy == "C" ~ 3)) |>
+  summarise(x = sum(potions))
+
+sprintf("Part I solution: %s", x)
+
+input = readLines("inputs/q1p2.txt")
+df = data.frame(enemy = unlist(strsplit(input, split = "")))
+
+df2 = df |>
+  mutate(group = rep(1:1000, each = 2))
+
+pair_ref = df2 |>
+  mutate(is_x = ifelse(enemy == "x", 1, 0)) |>
+  group_by(group) |>
+  summarise(is_x = max(is_x))
+
+x = df2 |>
+  inner_join(pair_ref, by = "group") |>
+  mutate(pts = case_when(enemy == "A" ~ 0,
+                         enemy == "x" ~ 0,
+                         enemy == "B" ~ 1,
+                         enemy == "C" ~ 3,
+                         enemy == "D" ~ 5),
+         new_pts = ifelse(is_x == 0, pts + 1, pts)) |>
+  summarise(pts = sum(new_pts)) |>
+  pull(pts)
+
+sprintf("Part II solution: %s", x)
+
+input = readLines("inputs/q1p3.txt")
+
+solve = function(input) {
+  map = c("x" = 0, "A" = 0, "B" = 1, "C" = 3, "D" = 5)
+  data = strsplit(input, "")[[1]]
+  base_score = sum(sapply(data, function(x) map[x]))
+  answer = base_score
+  
+  for (i in seq(1, length(data), by = 3)) {
+    group = data[i:min(i + 2, length(data))]
+    x_count = sum(group == "x")
+    
+    if (x_count == 1) {
+      answer = answer + 2
+    } else if (x_count == 0) {
+      answer = answer + 6
+    }
+  }
+  return(answer)
+}
+
+sprintf("Part II solution: %s", solve(input))
+```
+
+___
+
+### Quest 2
+
+```{r}
+input = readLines("inputs/q2p1.txt")
+keywords = unlist(strsplit(str_remove_all(input[1], "WORDS:"), ","))
+cnt = 0
+
+for (word in keywords) {
+  cnt = cnt + str_count(input[3], word)
+}
+
+sprintf("Part I solution: %s", cnt)
+
+input = readLines("inputs/q2p2.txt")
+header = input[1]
+lines = tail(input, -2)
+words = strsplit(strsplit(header, ":")[[1]][2], ",")[[1]]
+words = c(words, sapply(words, function(w) paste(rev(strsplit(w, "")[[1]]), collapse = "")))
+
+process_line = function(line) {
+  line_length = nchar(line)
+  match_flags = rep(FALSE, line_length)
+  for (word in words) {
+    word_length = nchar(word)
+    for (start in seq_len(line_length - word_length + 1)) {
+      if (substr(line, start, start + word_length - 1) == word) {
+        match_flags[start:(start + word_length - 1)] = T
+      }
+    }
+  }
+  return(sum(match_flags))
+}
+
+sprintf("Part II solution: %s", sum(sapply(lines, process_line)))
+```
+
+```{r}
+input_raw = readLines("inputs/q2p3.txt")
+keywords = unlist(strsplit(substr(input_raw[1], 7, nchar(input_raw[1])), ","))
+input = input_raw[3:length(input_raw)]
+input_split = strsplit(input, "")
+mat = do.call(rbind, lapply(input_split, function(x) matrix(x, nrow = 1)))
+
+mat
+```
+
+
+
+___
+
+### Quest 3
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
